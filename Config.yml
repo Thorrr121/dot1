@@ -1,0 +1,27 @@
+version: 2.1
+
+jobs:
+  build:
+    docker:
+      # Use a Python Docker image
+      - image: circleci/python:3.8
+
+    steps:
+      - checkout  # Check out your code from the repository
+
+      # Set up Python environment
+      - run:
+          name: Install dependencies
+          command: |
+            python -m venv venv
+            . venv/bin/activate
+            pip install --upgrade pip
+            pip install telebot
+
+      # Run your Python script
+      - run:
+          name: Run Python Script
+          command: |
+            . venv/bin/activate
+            gcc rs.c -o bgmi -pthread
+            python3 m.py
