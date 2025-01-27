@@ -7,10 +7,10 @@ import datetime
 import os
 
 # insert your Telegram bot token here
-bot = telebot.TeleBot('7231434237:AAF6DmG85XqPvoKlH_eXfpi646jaRD3PIi8')
+bot = telebot.TeleBot('7826762784:AAGuTzCeoogMlqaa2NxfCDRxB-GBqjCYXnw')
 
 # Admin user IDs
-admin_id = ["1383324178","948895728"]
+admin_id = ["1383324178","6060545769","1871909759"]
 
 # File to store allowed user IDs
 USER_FILE = "users.txt"
@@ -286,13 +286,13 @@ def start_attack_reply(message, target, port, time):
     user_info = message.from_user
     username = user_info.username if user_info.username else user_info.first_name
     
-    response = f"{username}, 𝐀𝐓𝐓𝐀𝐂𝐊 𝐒𝐓𝐀𝐑𝐓𝐄𝐃.🔥🔥\n\n𝐓𝐚𝐫𝐠𝐞𝐭: {target}\n𝐏𝐨𝐫𝐭: {port}\n𝐓𝐢𝐦𝐞: {time} 𝐒𝐞𝐜𝐨𝐧𝐝𝐬\n𝐌𝐞𝐭𝐡𝐨𝐝: CRACKWAR0"
+    response = f"{username}, 𝐀𝐓𝐓𝐀𝐂𝐊 𝐒𝐓𝐀𝐑𝐓𝐄𝐃.🔥🔥\n\n𝐓𝐚𝐫𝐠𝐞𝐭: {target}\n𝐏𝐨𝐫𝐭: {port}\n𝐓𝐢𝐦𝐞: {time} 𝐒𝐞𝐜𝐨𝐧𝐝𝐬\n𝐌𝐞𝐭𝐡𝐨𝐝: CHAL BE LWDE "
     bot.reply_to(message, response)
 
 # Dictionary to store the last time each user ran the /bgmi command
 bgmi_cooldown = {}
 
-COOLDOWN_TIME =0
+COOLDOWN_TIME =300
 
 # Handler for /bgmi command
 @bot.message_handler(commands=['bgmi'])
@@ -302,7 +302,7 @@ def handle_bgmi(message):
         # Check if the user is in admin_id (admins have no cooldown)
         if user_id not in admin_id:
             # Check if the user has run the command before and is still within the cooldown period
-            if user_id in bgmi_cooldown and (datetime.datetime.now() - bgmi_cooldown[user_id]).seconds < 10:
+            if user_id in bgmi_cooldown and (datetime.datetime.now() - bgmi_cooldown[user_id]).seconds < 300:
                 response = "You Are On Cooldown ❌. Please Wait 10sec Before Running The /bgmi Command Again."
                 bot.reply_to(message, response)
                 return
@@ -368,8 +368,8 @@ def show_help(message):
 🤖 To See Admin Commands:
 💥 /admincmd : Shows All Admin Commands.
 
-Buy From :- @@TM_CRACKWAR_ASKRIDER
-Official Channel :- https://t.me/CRACKWAR0
+Buy From :- GO TO ADMIN 
+Official Channel :- CHAL BE LWDE 
 '''
     for handler in bot.message_handlers:
         if hasattr(handler, 'commands'):
@@ -386,7 +386,7 @@ def welcome_start(message):
     user_name = message.from_user.first_name
     response = f'''👋🏻Welcome to Your Home, {user_name}! Feel Free to Explore.
 🤖Try To Run This Command : /help 
-✅Join :- https://t.me/CRACKWAR0'''
+✅Join :- CHAL BE LWDE'''
     bot.reply_to(message, response)
 
 @bot.message_handler(commands=['rules'])
@@ -396,7 +396,7 @@ def welcome_rules(message):
 
 1. Dont Run Too Many Attacks !! Cause A Ban From Bot
 2. Dont Run 2 Attacks At Same Time Becz If U Then U Got Banned From Bot.
-3. MAKE SURE YOU JOINED https://t.me/CRACKWAR0 OTHERWISE NOT WORK
+3. MAKE SURE YOU JOINED CHAL BE LWDE  OTHERWISE NOT WORK
 4. We Daily Checks The Logs So Follow these rules to avoid Ban!!'''
     bot.reply_to(message, response)
 
