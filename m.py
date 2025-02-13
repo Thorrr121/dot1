@@ -3,7 +3,9 @@ import os
 import json
 import subprocess
 
-bot = telebot.TeleBot(os.getenv("7178304372:AAG-wAx1h3y6SH-XXfBrlUkXD_vMEJjbMjk"))
+TOKEN = "7178304372:AAG-wAx1h3y6SH-XXfBrlUkXD_vMEJjbMjk"  # Replace this with your new bot token from BotFather
+
+bot = telebot.TeleBot(TOKEN)
 
 OWNER_ID = "1383324178"  # Change this to your owner ID
 admin_ids = {"6060545769", "1871909759"}  # Admins list
@@ -92,70 +94,7 @@ def add_coins(message):
     else:
         bot.reply_to(message, "🚫 Only Admins can use this command.")
 
-# Admin Checks User Coins
-@bot.message_handler(commands=['checkcoins'])
-def check_user_coins(message):
-    user_id = str(message.chat.id)
-    if user_id in admin_ids or user_id == OWNER_ID:
-        command = message.text.split()
-        if len(command) > 1:
-            target_user = command[1]
-            balance = user_coins.get(target_user, 0)
-            bot.reply_to(message, f"💰 User {target_user} has {balance} coins.")
-        else:
-            bot.reply_to(message, "Usage: /checkcoins <user_id>")
-    else:
-        bot.reply_to(message, "🚫 Only Admins can use this command.")
-
-# User Checks Own Coins
-@bot.message_handler(commands=['mycoins'])
-def my_coins(message):
-    user_id = str(message.chat.id)
-    balance = user_coins.get(user_id, 0)
-    bot.reply_to(message, f"💰 You have {balance} coins.")
-
-# Admin Adds Users
-@bot.message_handler(commands=['add'])
-def add_user(message):
-    user_id = str(message.chat.id)
-    if user_id in admin_ids or user_id == OWNER_ID:
-        command = message.text.split()
-        if len(command) > 1:
-            new_user = command[1]
-            if new_user not in allowed_users:
-                allowed_users.add(new_user)
-                with open(USER_FILE, "a") as file:
-                    file.write(f"{new_user}\n")
-                bot.reply_to(message, f"✅ User {new_user} has been granted access.")
-            else:
-                bot.reply_to(message, "❌ User already has access.")
-        else:
-            bot.reply_to(message, "Usage: /add <user_id>")
-    else:
-        bot.reply_to(message, "🚫 Only Admins can use this command.")
-
-# Admin Removes Users
-@bot.message_handler(commands=['remove'])
-def remove_user(message):
-    user_id = str(message.chat.id)
-    if user_id in admin_ids or user_id == OWNER_ID:
-        command = message.text.split()
-        if len(command) > 1:
-            user_to_remove = command[1]
-            if user_to_remove in allowed_users:
-                allowed_users.remove(user_to_remove)
-                with open(USER_FILE, "w") as file:
-                    for user in allowed_users:
-                        file.write(f"{user}\n")
-                bot.reply_to(message, f"✅ User {user_to_remove} has been removed.")
-            else:
-                bot.reply_to(message, "❌ User not found.")
-        else:
-            bot.reply_to(message, "Usage: /remove <user_id>")
-    else:
-        bot.reply_to(message, "🚫 Only Admins can use this command.")
-
-# Modified /bgmi Attack Command with Coin Deduction & Execution
+# /bgmi Attack Command with Coin Deduction & Execution
 @bot.message_handler(commands=['bgmi'])
 def handle_bgmi(message):
     user_id = str(message.chat.id)
