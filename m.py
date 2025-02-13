@@ -3,7 +3,7 @@ import os
 import json
 import subprocess
 
-bot = telebot.TeleBot(os.getenv("TELEGRAM_BOT_TOKEN"))
+bot = telebot.TeleBot(os.getenv("7178304372:AAG-wAx1h3y6SH-XXfBrlUkXD_vMEJjbMjk"))
 
 OWNER_ID = "1383324178"  # Change this to your owner ID
 admin_ids = {"6060545769", "1871909759"}  # Admins list
