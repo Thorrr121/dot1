@@ -86,6 +86,28 @@ def revoke_access(message):
     else:
         bot.reply_to(message, "🚫 Only Admins can use this command.")
 
+# Admin Adds Coins to User
+@bot.message_handler(commands=['addcoins'])
+def add_coins(message):
+    user_id = str(message.chat.id)
+    if user_id in admin_ids or user_id == OWNER_ID:
+        command = message.text.split()
+        if len(command) > 2:
+            target_user = command[1]
+            try:
+                amount = int(command[2])
+                if amount <= 0:
+                    raise ValueError
+                user_coins[target_user] = user_coins.get(target_user, 0) + amount
+                save_coins()
+                bot.reply_to(message, f"✅ Added {amount} coins to user {target_user}.")
+            except ValueError:
+                bot.reply_to(message, "❌ Invalid amount. Enter a positive number.")
+        else:
+            bot.reply_to(message, "Usage: /addcoins <user_id> <amount>")
+    else:
+        bot.reply_to(message, "🚫 Only Admins can use this command.")
+
 # /bgmi Attack Command with Coin Deduction & Time Limit
 @bot.message_handler(commands=['bgmi'])
 def handle_bgmi(message):
