@@ -4,7 +4,7 @@ import json
 import subprocess
 
 # Load token securely from an environment variable
-TOKEN = os.getenv("7178304372:AAG-wAx1h3y6SH-XXfBrlUkXD_vMEJjbMjk")  
+TOKEN = os.getenv("BOT_TOKEN")  
 OWNER_ID = "1383324178"  # Replace with your owner ID
 admin_ids = {"6060545769", "1871909759"}  # List of Admins
 
@@ -13,7 +13,7 @@ COINS_FILE = "coins.json"
 COIN_RATE = 10  # 1 sec = 10 coins
 MAX_ATTACK_TIME = 300  # Max attack time is 5 minutes (300 sec)
 
-bot = telebot.TeleBot(TOKEN)
+bot = telebot.TeleBot("7178304372:AAG-wAx1h3y6SH-XXfBrlUkXD_vMEJjbMjk")
 
 # Load authorized users
 def load_users():
