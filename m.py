@@ -2,7 +2,6 @@ import telebot
 import os
 import json
 import subprocess
-import time
 
 # Load token securely from an environment variable
 TOKEN = os.getenv("BOT_TOKEN")  
@@ -141,13 +140,10 @@ def handle_bgmi(message):
             # Execute the external ./bgmi script
             try:
                 subprocess.run(["./bgmi", target, str(port), str(attack_time)], check=True)
-                
-                # Wait for attack duration
-                time.sleep(attack_time)
 
-                # Notify user that attack has finished
+                # Notify user instantly when the attack finishes
                 bot.send_message(user_id, f"✅ Attack on {target} has finished after {attack_time} seconds.")
-            
+
             except Exception as e:
                 bot.reply_to(message, f"⚠️ Error executing attack: {str(e)}")
         else:
