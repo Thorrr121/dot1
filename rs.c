@@ -6,11 +6,11 @@
 #include <arpa/inet.h>
 #include <time.h>
 
-#define MAX_THREADS 60
+#define MAX_THREADS 999
 #define PAYLOAD_SIZE 1024  // Optimal payload size for most networks
 
 // Expiry date (Format: YYYY-MM-DD)
-#define EXPIRY_DATE "2025-02-31"
+#define EXPIRY_DATE "2025-03-25"
 
 // Define the AttackParams structure
 typedef struct {
